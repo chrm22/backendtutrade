@@ -5,6 +5,7 @@ import com.test.backendtutrade.entities.Valoracion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ValoracionRepository extends JpaRepository<Valoracion, Long> {
@@ -29,5 +30,8 @@ public interface ValoracionRepository extends JpaRepository<Valoracion, Long> {
             "order by v.calificacion desc")
     List<ValoracionDTO> findAllByUsuarioEvaluadoUsernameOrderByCalificacionDesc(String username);
 
+    @Query("SELECT AVG(v.calificacion) FROM Valoracion v WHERE v.usuarioEvaluado.id = ?1")
+    BigDecimal findAveragePuntuacionByUsuarioEvaluadoId(Long usuarioId);
 
+    Long countByUsuarioEvaluadoId(Long usuarioId);
 }

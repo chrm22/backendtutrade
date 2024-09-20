@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -52,6 +53,15 @@ public class ValoracionService implements IValoracionService {
 
         Valoracion valoracionResponse = valoracionRepository.save(valoracion);
 
+        if (valoracionRepository.countByUsuarioEvaluadoId(evaluado.getId()) == 0)
+            throw new RuntimeException("No se puede registrar la valoracion");
+
+        evaluado.getInformacionUsuario()
+                .setCalificacionPromedio
+                        (valoracionRepository.findAveragePuntuacionByUsuarioEvaluadoId(evaluadoId));
+
+        usuarioRepository.save(evaluado);
+
         return valoracionMapper.valoracionToValoracionDTO(valoracionResponse);
     }
 
@@ -72,6 +82,6 @@ public class ValoracionService implements IValoracionService {
     @Transactional(readOnly = true)
     public List<ValoracionDTO> listarValoracionesPorUsuarioDesc(String username) {
         return valoracionRepository.
-                findAllByUsuarioEvaluadoUsernameOrderByCalificacionAsc(username);
+                findAllByUsuarioEvaluadoUsernameOrderByCalificacionDesc(username);
     }
 }
