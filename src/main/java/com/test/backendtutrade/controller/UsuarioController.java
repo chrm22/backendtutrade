@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = {"http://localhost:4200", "18.222.240.43"})
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
