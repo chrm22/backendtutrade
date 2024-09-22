@@ -9,8 +9,6 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    Optional<Usuario> findByInformacionUsuarioEmail(String email);
-
     Optional<Usuario> findByUsername(String username);
 
     @Query("select u from Usuario u inner join u.roles roles " +
@@ -25,8 +23,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             "and u.estado not like 'eliminado' " +
             "and u.estado not like 'suspendido'")
     List<Usuario> findAllByRolesNombreNotLike(String rolAdmitido, String rolDenegado);
-
-    List<Usuario> findAllByEstadoIsNotLike(String estado);
 
     @Query("SELECT u FROM Usuario u JOIN FETCH u.roles WHERE u.username = ?1")
     Optional<Usuario> findByUsernameWithRoles(String username);

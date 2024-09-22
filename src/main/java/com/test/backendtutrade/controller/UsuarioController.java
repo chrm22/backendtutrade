@@ -90,9 +90,7 @@ public class UsuarioController {
 
     @PutMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminarUsuarioAdmin(@PathVariable Long id) {
-
         usuarioService.eliminarUsuarioAdmin(id);
-
         return ResponseEntity.noContent().build();
     }
 

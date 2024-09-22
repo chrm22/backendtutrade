@@ -50,7 +50,6 @@ public class UsuarioService implements IUsuarioService {
                 usuarioRegistroDTO.getPais()
         );
 
-        // Mapeo UsuarioDTO a Usuario
         Usuario usuario = usuarioMapper.usuarioRegistroDTOToUsuario(usuarioRegistroDTO);
 
         InfoUsuario infoUsuario = usuario.getInformacionUsuario();

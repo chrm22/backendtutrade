@@ -14,6 +14,7 @@ public interface IUsuarioService {
 
     void eliminarUsuario(String username);
 
+    // Metodo de eliminar para administrados
     void eliminarUsuarioAdmin(Long id);
 
     UsuarioDTO suspenderUsuario(Long id);
