@@ -32,7 +32,7 @@ public class Pedido {
     @Column(name = "fecha_hora_creacion", nullable = false)
     private Instant fechaHoraCreacion;
 
-    @ColumnDefault("pendiente")
+    @ColumnDefault("'pendiente'")
     @Column(name = "estado", nullable = false, length = 24)
     private String estado;
 

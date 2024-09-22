@@ -33,7 +33,7 @@ public class Usuario {
     @Column(name = "fecha_hora_creacion", nullable = false)
     private Instant fechaHoraCreacion;
 
-    @ColumnDefault("activo")
+    @ColumnDefault("'activo'")
     @Column(name = "estado", nullable = false, length = 24)
     private String estado;
 
