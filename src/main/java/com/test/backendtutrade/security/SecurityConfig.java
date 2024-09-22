@@ -58,12 +58,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/valoraciones/**").hasAnyAuthority("ROL_USUARIO","ROL_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/pedidos/**").hasAuthority("ROL_USUARIO")
 
-                        .requestMatchers(HttpMethod.GET, "/api/conteo/estado").hasAuthority("ROL_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/conteo/estado").hasAuthority("ROL_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/conteo/etiqueta").hasAuthority("ROL_ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/articulos/**").hasAuthority("ROL_USUARIO")
                         .requestMatchers(HttpMethod.POST, "/api/valoraciones/**").hasAuthority("ROL_USUARIO")
 //
                         .requestMatchers(HttpMethod.PUT, "/api/pedidos/**").hasAnyAuthority("ROL_USUARIO","ROL_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/eliminar").hasAnyAuthority("ROL_USUARIO","ROL_ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/eliminar/**").hasAuthority("ROL_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/suspender/**").hasAuthority("ROL_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/roles/**").hasAuthority("ROL_ADMIN")
 //                        //.antMatchers(HttpMethod.GET,"/api/employees").hasAnyRole("STUDENT", "ADMIN")ROLE_UNIVERSITARIO
 //
 //                        .requestMatchers("/api/estudiantes/**").hasAnyAuthority("ROLE_ADMIN")
