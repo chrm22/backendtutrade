@@ -1,9 +1,6 @@
 package com.test.backendtutrade.service;
 
-import com.test.backendtutrade.dtos.UsuarioDTO;
-import com.test.backendtutrade.dtos.UsuarioPerfilDTO;
-import com.test.backendtutrade.dtos.UsuarioRegistroDTO;
-import com.test.backendtutrade.dtos.UsuarioResumenDTO;
+import com.test.backendtutrade.dtos.*;
 import com.test.backendtutrade.entities.InfoUsuario;
 import com.test.backendtutrade.entities.Rol;
 import com.test.backendtutrade.entities.Usuario;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +34,7 @@ public class UsuarioService implements IUsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
     @Transactional
     public UsuarioDTO registrarUsuario(UsuarioRegistroDTO usuarioRegistroDTO) {
         usuarioRegistroDTO = new UsuarioRegistroDTO(
@@ -71,13 +70,15 @@ public class UsuarioService implements IUsuarioService {
         return usuarioMapper.usuarioToUsuarioDTO(usuario);
     }
 
+    @Override
     @Transactional
-    public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
-        Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException
-                        (String.format("Usuario con id %d no encontrado", id)));
+    public UsuarioDTO actualizarUsuario(String username, UsuarioDTO usuarioDTO) {
 
-        usuarioDTO.setId(id);
+        Usuario usuarioExistente = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException
+                        ("Usuario '" + username + "' no encontrado"));
+
+        usuarioDTO.setId(usuarioExistente.getId());
 
         usuarioMapper.updateUsuarioFromDTO(usuarioDTO, usuarioExistente);
 
@@ -86,31 +87,124 @@ public class UsuarioService implements IUsuarioService {
         return usuarioMapper.usuarioToUsuarioDTO(usuarioActualizado);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public UsuarioPerfilDTO obtenerPerfilUsuario(String username) {
+
+        if (username.equals("admin"))
+            throw new RuntimeException("Usuario administrador");
+
         Usuario usuarioExistente = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         return usuarioMapper.usuarioToUsuarioPerfilDTO(usuarioExistente);
     }
 
+    @Override
     @Transactional
-    public void eliminarUsuario(Long id) {
+    public void eliminarUsuario(String username) {
+
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException
+                        ("Usuario '" + username + "' no encontrado"));
+
+        usuario.setEstado("eliminado");
+
+        usuario.getRoles().clear();
+
+        usuario.getArticulos().forEach(articulo -> articulo.setEstado("eliminado"));
+
+        usuarioRepository.save(usuario);
+
+
+
+    }
+
+    @Override
+    @Transactional
+    public void eliminarUsuarioAdmin(Long id) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException
                         (String.format("Usuario con id %d no encontrado", id)));
 
+        if (usuario.getEstado().equals("eliminado"))
+            throw new RuntimeException("Usuario ya se encuentra eliminado");
+
         usuario.setEstado("eliminado");
+
+        usuario.getRoles().clear();
+
+        usuario.getArticulos().forEach(articulo -> articulo.setEstado("eliminado"));
+
+        usuarioRepository.save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public UsuarioDTO suspenderUsuario(Long id) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException
+                        (String.format("Usuario con id %d no encontrado", id)));
+
+        if (usuario.getEstado().equals("eliminado"))
+            throw new RuntimeException("Usuario se encuentra eliminado");
+
+        usuario.setEstado("suspendido");
+
+        usuario.getArticulos().forEach(articulo -> articulo.setEstado("no_disponible"));
+
+        Usuario usuarioFinal = usuarioRepository.save(usuario);
+
+        return usuarioMapper.usuarioToUsuarioDTO(usuarioFinal);
+    }
+
+    @Override
+    @Transactional
+    public UsuarioRolesDTO modificarRolesUsuario(Long id, ModificarRolesDTO modificarRolesDTO) {
+        // Buscar el usuario por id
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
+
+        Set<Rol> rolesActuales = usuario.getRoles();
+
+        // Roles a asignar
+        if (modificarRolesDTO.getRolesAsignar() != null) {
+            for (String nombreRol : modificarRolesDTO.getRolesAsignar()) {
+                Rol rol = rolRepository.findByNombreOpcional(nombreRol)
+                        .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+
+                if (!rolesActuales.contains(rol)) {
+                    usuario.getRoles().add(rol);
+                }
+            }
+        }
+
+        // Roles a revocar
+        if (modificarRolesDTO.getRolesRevocar() != null) {
+            for (String nombreRol : modificarRolesDTO.getRolesRevocar()) {
+                Rol rol = rolRepository.findByNombreOpcional(nombreRol)
+                        .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+
+                if (rol.getNombre().equals("ADMIN") && rolesActuales.contains(rol)) {
+                    throw new IllegalArgumentException("No se puede revocar el rol de administrador.");
+                }
+
+                usuario.getRoles().remove(rol);
+            }
+        }
+
         usuarioRepository.save(usuario);
 
+        List<String> nombresRoles = usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .collect(Collectors.toList());
+
+        return new UsuarioRolesDTO(usuario.getId(), nombresRoles);
     }
 
-    @Transactional
-    public void eliminarUsuarioFisico(Long id) {
-        usuarioRepository.deleteById(id);
-    }
-
+    @Override
     @Transactional(readOnly = true)
     public List<UsuarioDTO> listarUsuarios() {
         return usuarioRepository.findAllByRolesNombre("ROL_USUARIO")
@@ -119,9 +213,10 @@ public class UsuarioService implements IUsuarioService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<UsuarioResumenDTO> listarUsuariosResumidos() {
-        return usuarioRepository.findAllByRolesNombre("ROL_USUARIO")
+        return usuarioRepository.findAllByRolesNombreNotLike("ROL_USUARIO", "ROL_ADMIN")
                 .stream()
                 .map(usuarioMapper::usuarioToUsuarioResumenDTO)
                 .collect(Collectors.toList());

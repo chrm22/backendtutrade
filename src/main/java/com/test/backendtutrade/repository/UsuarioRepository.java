@@ -13,7 +13,18 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByUsername(String username);
 
+    @Query("select u from Usuario u inner join u.roles roles " +
+            "where roles.nombre = ?1 " +
+            "and u.estado not like 'eliminado' " +
+            "and u.estado not like 'suspendido'")
     List<Usuario> findAllByRolesNombre(String nombre);
+
+    @Query("select u from Usuario u inner join u.roles roles " +
+            "where roles.nombre like ?1 " +
+            "and roles.nombre not like ?2 " +
+            "and u.estado not like 'eliminado' " +
+            "and u.estado not like 'suspendido'")
+    List<Usuario> findAllByRolesNombreNotLike(String rolAdmitido, String rolDenegado);
 
     List<Usuario> findAllByEstadoIsNotLike(String estado);
 
