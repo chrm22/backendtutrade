@@ -1,8 +1,6 @@
 package com.test.backendtutrade.interfaces;
 
-import com.test.backendtutrade.dtos.ArticuloDTO;
-import com.test.backendtutrade.dtos.ArticuloPorEstadoDTO;
-import com.test.backendtutrade.dtos.ArticuloRegistroDTO;
+import com.test.backendtutrade.dtos.*;
 
 import java.util.List;
 
@@ -16,5 +14,13 @@ public interface IArticuloService {
 
     List<ArticuloDTO> filtrarPorEtiquetas(List<String> etiquetas);
 
+    List<ArticuloDTO> listarMisArticulos(String username);
+
+    ArticuloDTO cambiarEstadoMiArticulo(String username, EstadoArticuloDTO estadoArticuloDTO);
+
+    ArticuloDTO eliminarArticuloAdmin(Long id);
+
     List<ArticuloPorEstadoDTO> groupAndCountByEstado();
+
+    List<ArticuloPorEtiquetaDTO> groupAndCountByEtiqueta();
 }

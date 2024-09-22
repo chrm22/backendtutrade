@@ -1,8 +1,6 @@
 package com.test.backendtutrade.service;
 
-import com.test.backendtutrade.dtos.ArticuloDTO;
-import com.test.backendtutrade.dtos.ArticuloPorEstadoDTO;
-import com.test.backendtutrade.dtos.ArticuloRegistroDTO;
+import com.test.backendtutrade.dtos.*;
 import com.test.backendtutrade.entities.*;
 import com.test.backendtutrade.exceptions.ResourceNotFoundException;
 import com.test.backendtutrade.interfaces.IArticuloService;
@@ -12,6 +10,8 @@ import com.test.backendtutrade.mappers.ImagenMapper;
 import com.test.backendtutrade.repository.ArticuloRepository;
 import com.test.backendtutrade.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 public class ArticuloService implements IArticuloService {
 
-    private final int MAX_ETIQUETAS = 5;
     private final ArticuloRepository articuloRepository;
     private final ArticuloMapper articuloMapper;
     private final UsuarioRepository usuarioRepository;
@@ -81,6 +80,7 @@ public class ArticuloService implements IArticuloService {
     @Override
     @Transactional(readOnly = true)
     public List<ArticuloDTO> filtrarPorEtiquetas(List<String> etiquetas) {
+        int MAX_ETIQUETAS = 5;
         if (etiquetas.size() > MAX_ETIQUETAS) {
             throw new IllegalArgumentException("No se pueden usar más de " + MAX_ETIQUETAS + " etiquetas.");
         }
@@ -93,8 +93,61 @@ public class ArticuloService implements IArticuloService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ArticuloDTO> listarMisArticulos(String username) {
+        return articuloRepository.findAllByUsuarioUsernameAndEstadoIsNotLike(username, "eliminado")
+                .stream()
+                .map(articuloMapper::articuloToArticuloDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public ArticuloDTO cambiarEstadoMiArticulo(String username, EstadoArticuloDTO estadoArticuloDTO) {
+
+        Articulo articulo = articuloRepository.findById(estadoArticuloDTO.articuloId())
+                .orElseThrow(() -> new ResourceNotFoundException("Articulo no encontrado"));
+
+        if (!articulo.getUsuario().getUsername().equals(username))
+            throw new RuntimeException("Acceso denegado");
+
+        String estadoNuevo = estadoArticuloDTO.nuevoEstado();
+
+        if (!(estadoNuevo.equals("disponible") || estadoNuevo.equals("intercambiado")))
+            throw new RuntimeException("Estado inválido");
+
+        articulo.setEstado(estadoNuevo);
+        articulo.setPublico(estadoArticuloDTO.publico());
+
+        Articulo articuloFinal = articuloRepository.save(articulo);
+
+        return articuloMapper.articuloToArticuloDTO(articuloFinal);
+    }
+
+    @Override
+    @Transactional
+    public ArticuloDTO eliminarArticuloAdmin(Long id) {
+
+        Articulo articulo = articuloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Articulo no encontrado"));
+
+        articulo.setEstado("eliminado");
+        Articulo articuloFinal = articuloRepository.save(articulo);
+
+        return articuloMapper.articuloToArticuloDTO(articuloFinal);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ArticuloPorEstadoDTO> groupAndCountByEstado() {
         return articuloRepository.groupAndCountByEstado();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ArticuloPorEtiquetaDTO> groupAndCountByEtiqueta() {
+        Pageable topDiez = PageRequest.of(0, 10);
+
+        return articuloRepository.groupAndCountByEtiqueta(topDiez);
     }
 
     private Set<Imagen> convertRegistroDTOToSetImagenes(ArticuloRegistroDTO articuloRegistroDTO) {

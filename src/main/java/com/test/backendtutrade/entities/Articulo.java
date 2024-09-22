@@ -34,7 +34,7 @@ public class Articulo {
     @Column(name = "publico", nullable = false)
     private Boolean publico = false;
 
-    @ColumnDefault("disponible")
+    @ColumnDefault("'disponible'")
     @Column(name = "estado", nullable = false, length = 24)
     private String estado;
 

@@ -1,8 +1,6 @@
 package com.test.backendtutrade.controller;
 
-import com.test.backendtutrade.dtos.ArticuloDTO;
-import com.test.backendtutrade.dtos.ArticuloPorEstadoDTO;
-import com.test.backendtutrade.dtos.ArticuloRegistroDTO;
+import com.test.backendtutrade.dtos.*;
 import com.test.backendtutrade.service.ArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +49,36 @@ public class ArticuloController {
         return ResponseEntity.ok(articulos);
     }
 
+    @GetMapping("/mis-articulos")
+    public ResponseEntity<List<ArticuloDTO>> listarMisArticulos() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        List<ArticuloDTO> misArticulos = articuloService.listarMisArticulos(username);
+
+        return ResponseEntity.ok(misArticulos);
+    }
+
+    @PutMapping("/mis-articulos")
+    public ResponseEntity<ArticuloDTO> cambiarEstadoMiArticulo(@RequestBody EstadoArticuloDTO estadoArticuloDTO) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        ArticuloDTO articuloDTO = articuloService.cambiarEstadoMiArticulo(username, estadoArticuloDTO);
+
+        return ResponseEntity.ok(articuloDTO);
+    }
+
+    @PutMapping("/articulos/{id}/eliminar")
+    public ResponseEntity<ArticuloDTO> eliminarArticulo(@PathVariable Long id) {
+
+        ArticuloDTO articuloDTO = articuloService.eliminarArticuloAdmin(id);
+
+        return ResponseEntity.ok(articuloDTO);
+    }
+
     @PostMapping("/articulos")
     public ResponseEntity<ArticuloDTO> registrarArticulo
             (@RequestBody ArticuloRegistroDTO articuloRegistroDTO) {
@@ -63,9 +91,15 @@ public class ArticuloController {
         return ResponseEntity.ok(articuloDTO);
     }
 
-    @GetMapping("/conteo/estado")
+    @GetMapping("/articulos/conteo/estado")
     public ResponseEntity<List<ArticuloPorEstadoDTO>> groupAndCountByEstado(){
         return ResponseEntity.ok(articuloService.groupAndCountByEstado());
     }
+
+    @GetMapping("/articulos/conteo/etiqueta")
+    public ResponseEntity<List<ArticuloPorEtiquetaDTO>> groupAndCountByEtiqueta(){
+        return ResponseEntity.ok(articuloService.groupAndCountByEtiqueta());
+    }
+
 
 }
