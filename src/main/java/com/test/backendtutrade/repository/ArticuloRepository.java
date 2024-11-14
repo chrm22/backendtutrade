@@ -13,6 +13,14 @@ public interface ArticuloRepository extends JpaRepository<Articulo, Long> {
 
     @Query("select a from Articulo a " +
             "where a.publico = true " +
+            "and a.usuario.username not like ?1 " +
+            "and a.estado not like 'eliminado' " +
+            "and a.estado not like 'intercambiado' " +
+            "and a.estado not like 'no_disponible'")
+    List<Articulo> findAllByPublicoIsTrueNotUsuario(String username);
+
+    @Query("select a from Articulo a " +
+            "where a.publico = true " +
             "and a.estado not like 'eliminado' " +
             "and a.estado not like 'intercambiado' " +
             "and a.estado not like 'no_disponible'")
@@ -25,7 +33,14 @@ public interface ArticuloRepository extends JpaRepository<Articulo, Long> {
             "and a.estado not like 'no_disponible'")
     List<Articulo> findAllByUsuarioUsernameAndPublicoIsTrue(String username);
 
+    @Query("select a from Articulo a where a.usuario.username = ?1 and a.estado not like ?2")
     List<Articulo> findAllByUsuarioUsernameAndEstadoIsNotLike(String username, String estado);
+
+    @Query("select a from Articulo a " +
+            "left join a.articulosPedidos p " +
+            "where a.usuario.username = ?1 " +
+            "and (p.id is null or p.articulo.id != ?2)")
+    List<Articulo> listarMisArticulosExceptoOfrecidosA(String username, Long id);
 
     @Query("select distinct a " +
             "from Articulo a " +

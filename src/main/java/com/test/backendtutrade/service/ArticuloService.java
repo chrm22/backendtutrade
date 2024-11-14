@@ -8,6 +8,7 @@ import com.test.backendtutrade.mappers.ArticuloMapper;
 import com.test.backendtutrade.mappers.EtiquetaMapper;
 import com.test.backendtutrade.mappers.ImagenMapper;
 import com.test.backendtutrade.repository.ArticuloRepository;
+import com.test.backendtutrade.repository.PedidoRepository;
 import com.test.backendtutrade.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -25,12 +26,33 @@ public class ArticuloService implements IArticuloService {
     private final ArticuloRepository articuloRepository;
     private final ArticuloMapper articuloMapper;
     private final UsuarioRepository usuarioRepository;
+    private final PedidoRepository pedidoRepository;
 
     @Autowired
-    public ArticuloService(ArticuloRepository articuloRepository, ArticuloMapper articuloMapper, UsuarioRepository usuarioRepository) {
+    public ArticuloService(ArticuloRepository articuloRepository, ArticuloMapper articuloMapper, UsuarioRepository usuarioRepository, PedidoRepository pedidoRepository) {
         this.articuloRepository = articuloRepository;
         this.articuloMapper = articuloMapper;
         this.usuarioRepository = usuarioRepository;
+        this.pedidoRepository = pedidoRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ArticuloDTO obtenerArticulo(String username, Long id) {
+
+        Articulo articulo = articuloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Articulo no encontrado"));
+
+        ArticuloDTO articuloResponse = articuloMapper.articuloToArticuloDTO(articulo);
+
+        if (articulo.getPublico() ||
+            articulo.getUsuario().getUsername().equals(username) ||
+            this.esArticuloOfrecido(username, id)) {
+            return articuloResponse;
+        }
+        else {
+            throw new ResourceNotFoundException("Articulo no encontrado");
+        }
     }
 
     @Override
@@ -70,6 +92,15 @@ public class ArticuloService implements IArticuloService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ArticuloDTO> listarArticulosPublicosExcluirUsuario(String username) {
+        return articuloRepository.findAllByPublicoIsTrueNotUsuario(username)
+                .stream()
+                .map(articuloMapper::articuloToArticuloDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ArticuloDTO> listarArticulosPublicosPorUsuario(String username) {
         return articuloRepository.findAllByUsuarioUsernameAndPublicoIsTrue(username)
                 .stream()
@@ -95,6 +126,15 @@ public class ArticuloService implements IArticuloService {
     @Transactional(readOnly = true)
     public List<ArticuloDTO> listarMisArticulos(String username) {
         return articuloRepository.findAllByUsuarioUsernameAndEstadoIsNotLike(username, "eliminado")
+                .stream()
+                .map(articuloMapper::articuloToArticuloDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ArticuloDTO> listarMisArticulosExceptoOfrecidosA(String username, Long id) {
+        return articuloRepository.listarMisArticulosExceptoOfrecidosA(username, id)
                 .stream()
                 .map(articuloMapper::articuloToArticuloDTO)
                 .collect(Collectors.toList());
@@ -167,6 +207,15 @@ public class ArticuloService implements IArticuloService {
                 .stream()
                 .map(etiquetaMapper::toEntity)
                 .collect(Collectors.toSet());
+    }
+
+    private boolean esArticuloOfrecido(String username, Long id) {
+        Set<Long> ids = pedidoRepository.findAllByArticuloUsuarioUsername(username)
+                .stream()
+                .map(pedido -> pedido.getArticuloOfrecido().getId())
+                .collect(Collectors.toSet());
+
+        return ids.contains(id);
     }
 
 }

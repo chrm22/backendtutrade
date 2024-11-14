@@ -23,10 +23,24 @@ public class ArticuloController {
         this.articuloService = articuloService;
     }
 
+    @GetMapping("/articulos/{id}")
+    public ResponseEntity<ArticuloDTO> obtenerArticulo(@PathVariable Long id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        ArticuloDTO articulo = articuloService.obtenerArticulo(username, id);
+
+        return ResponseEntity.ok(articulo);
+    }
+
     @GetMapping("/articulos")
     public ResponseEntity<List<ArticuloDTO>> listarArticulosPublicos() {
 
-        List<ArticuloDTO> articuloDTOS = articuloService.listarArticulosPublicos();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        List<ArticuloDTO> articuloDTOS = articuloService.listarArticulosPublicosExcluirUsuario(username);
 
         return ResponseEntity.ok(articuloDTOS);
     }
@@ -57,6 +71,17 @@ public class ArticuloController {
         String username = authentication.getName();
 
         List<ArticuloDTO> misArticulos = articuloService.listarMisArticulos(username);
+
+        return ResponseEntity.ok(misArticulos);
+    }
+
+    @GetMapping("/mis-articulos/except/{id}")
+    public ResponseEntity<List<ArticuloDTO>> listarMisArticulosExceptoOfrecidosA(@PathVariable Long id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        List<ArticuloDTO> misArticulos = articuloService.listarMisArticulosExceptoOfrecidosA(username, id);
 
         return ResponseEntity.ok(misArticulos);
     }
