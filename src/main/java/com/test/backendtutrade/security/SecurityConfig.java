@@ -27,7 +27,8 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             // -- login
             "/api/usuarios/login/**",
-            "/api/usuarios/register/**"
+            "/api/usuarios/register/**",
+            "/error"
     };
 
     @Bean
@@ -72,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/usuarios/roles/**").hasAuthority("ROL_ADMIN")
 //                        //.antMatchers(HttpMethod.GET,"/api/employees").hasAnyRole("STUDENT", "ADMIN")ROLE_UNIVERSITARIO
 //
+                        .requestMatchers("/error").permitAll()
 //                        .requestMatchers("/api/estudiantes/**").hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
         );
