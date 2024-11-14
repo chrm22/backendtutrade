@@ -26,4 +26,12 @@ public interface IUsuarioService {
     List<UsuarioDTO> listarUsuarios();
 
     List<UsuarioResumenDTO> listarUsuariosResumidos();
+
+    Boolean existsByUsername(String username);
+
+    Boolean existsByEmail(String email);
+
+    Boolean existsByDni(String dni);
+
+    Boolean existsByTelefono(String telefono);
 }

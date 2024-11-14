@@ -29,4 +29,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT u FROM Usuario u JOIN FETCH u.roles WHERE u.username = ?1")
     Optional<Usuario> findByUsernameWithRoles(String username);
+
+    Boolean existsByUsername(String username);
+
+    Boolean existsByInformacionUsuarioEmail(String email);
+
+    Boolean existsByInformacionUsuarioDni(String dni);
+
+    Boolean existsByInformacionUsuarioTelefono(String telefono);
 }

@@ -163,5 +163,47 @@ public class UsuarioController {
         return ResponseEntity.ok(usuariosResumenDTOS);
     }
 
+    @GetMapping("/existe/username/{username}")
+    public ResponseEntity<Void> verificarUsernameDisponible(@PathVariable String username) {
+
+        if (usuarioService.existsByUsername(username)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/existe/email/{email}")
+    public ResponseEntity<Void> verificarEmailDisponible(@PathVariable String email) {
+
+        if (usuarioService.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/existe/dni/{dni}")
+    public ResponseEntity<Void> verificarDniDisponible(@PathVariable String dni) {
+
+        if (usuarioService.existsByDni(dni)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/existe/telefono/{telefono}")
+    public ResponseEntity<Void> verificarTelefonoDisponible(@PathVariable String telefono) {
+
+        if (usuarioService.existsByTelefono(telefono)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }

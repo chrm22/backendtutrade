@@ -229,4 +229,28 @@ public class UsuarioService implements IUsuarioService {
                 .map(usuarioMapper::usuarioToUsuarioResumenDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean existsByUsername(String username) {
+        return usuarioRepository.existsByUsername(username);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean existsByEmail(String email) {
+        return usuarioRepository.existsByInformacionUsuarioEmail(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean existsByDni(String dni) {
+        return usuarioRepository.existsByInformacionUsuarioDni(dni);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean existsByTelefono(String telefono) {
+        return usuarioRepository.existsByInformacionUsuarioTelefono(telefono);
+    }
 }
