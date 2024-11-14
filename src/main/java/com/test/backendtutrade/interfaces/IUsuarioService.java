@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface IUsuarioService {
 
+    UsuarioDTO obtenerUsuarioPorId(Long id);
+
     UsuarioDTO registrarUsuario(UsuarioRegistroDTO usuarioRegistroDTO);
 
     UsuarioDTO actualizarUsuario(String username, UsuarioDTO usuarioDTO);

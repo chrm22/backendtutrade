@@ -131,12 +131,20 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public ResponseEntity<UsuarioPerfilDTO> obtenerPerfilPorUsername(@PathVariable String username) {
 
         UsuarioPerfilDTO usuarioPerfilDTO = usuarioService.obtenerPerfilUsuario(username);
 
         return ResponseEntity.ok(usuarioPerfilDTO);
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UsuarioDTO> obtenerUsuarioPorId(@PathVariable Long id) {
+
+        UsuarioDTO usuarioDTO = usuarioService.obtenerUsuarioPorId(id);
+
+        return ResponseEntity.ok(usuarioDTO);
     }
 
     @GetMapping

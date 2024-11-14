@@ -9,6 +9,9 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+    @Query("select u from Usuario u inner join u.roles roles where u.id = ?1 and roles.nombre not like ?2")
+    Optional<Usuario> findByIdAndRolesNombreIsNotLike(Long id, String role);
+
     Optional<Usuario> findByUsername(String username);
 
     @Query("select u from Usuario u inner join u.roles roles " +

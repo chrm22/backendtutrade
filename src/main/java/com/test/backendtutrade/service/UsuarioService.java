@@ -35,6 +35,15 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public UsuarioDTO obtenerUsuarioPorId(Long id) {
+        Usuario usuario = usuarioRepository.findByIdAndRolesNombreIsNotLike(id, "ROL_ADMIN")
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        return usuarioMapper.usuarioToUsuarioDTO(usuario);
+    }
+
+    @Override
     @Transactional
     public UsuarioDTO registrarUsuario(UsuarioRegistroDTO usuarioRegistroDTO) {
         usuarioRegistroDTO = new UsuarioRegistroDTO(
