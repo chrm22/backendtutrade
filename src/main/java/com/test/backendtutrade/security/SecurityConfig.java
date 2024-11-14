@@ -25,9 +25,12 @@ public class SecurityConfig {
     private JwtRequestFilter jwtRequestFilter;
 
     private static final String[] AUTH_WHITELIST = {
-            // -- login
+            // login
             "/api/usuarios/login/**",
+            // registro
             "/api/usuarios/register/**",
+            // existe username/email/dni/telefono
+            "/api/usuarios/existe/**",
             "/error"
     };
 
