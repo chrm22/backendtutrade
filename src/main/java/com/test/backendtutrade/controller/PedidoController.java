@@ -36,6 +36,17 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoResponse);
     }
 
+    @GetMapping("/pedidos/{id}")
+    public ResponseEntity<PedidoDTO> buscarPedido(@PathVariable Long id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        PedidoDTO pedidoResponse = pedidoService.buscarPedido(username, id);
+
+        return ResponseEntity.ok(pedidoResponse);
+    }
+
     @PutMapping("/pedidos/recibidos")
     public ResponseEntity<PedidoDTO> aceptarRechazarPedido(@RequestBody EstadoPedidoDTO estadoPedidoDTO) {
 

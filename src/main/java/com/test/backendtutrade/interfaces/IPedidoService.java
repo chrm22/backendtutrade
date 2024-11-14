@@ -10,6 +10,8 @@ public interface IPedidoService {
 
     PedidoDTO registrarPedido(Long articuloId, String username, PedidoRegistroDTO pedido);
 
+    PedidoDTO buscarPedido(String username, Long id);
+
     PedidoDTO aceptarRechazarPedido(String username, EstadoPedidoDTO estadoPedidoDTO);
 
     PedidoDTO cancelarPedido(String username, EstadoPedidoDTO estadoPedidoDTO);

@@ -55,11 +55,27 @@ public class PedidoService implements IPedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PedidoDTO buscarPedido(String username, Long id) {
+
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        if (!pedido.getArticulo().getUsuario().getUsername().equals(username))
+            throw new RuntimeException("Acceso denegado");
+
+        if (!pedido.getEstado().equals("pendiente"))
+            throw new RuntimeException("Pedido ya no disponible");
+
+        return pedidoMapper.pedidoToPedidoDTO(pedido);
+    }
+
+    @Override
     @Transactional
     public PedidoDTO aceptarRechazarPedido(String username, EstadoPedidoDTO estadoPedidoDTO) {
 
         Pedido pedido = pedidoRepository.findById(estadoPedidoDTO.pedidoId())
-                .orElseThrow(() -> new RuntimeException("Pedido Ano encontrado"));
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
         if (!pedido.getArticulo().getUsuario().getUsername().equals(username))
             throw new RuntimeException("Acceso denegado");
