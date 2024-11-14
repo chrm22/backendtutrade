@@ -61,7 +61,8 @@ public class PedidoService implements IPedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
-        if (!pedido.getArticulo().getUsuario().getUsername().equals(username))
+        if (!(pedido.getArticulo().getUsuario().getUsername().equals(username) ||
+                pedido.getArticuloOfrecido().getUsuario().getUsername().equals(username)))
             throw new RuntimeException("Acceso denegado");
 
         if (!pedido.getEstado().equals("pendiente"))
