@@ -14,7 +14,7 @@ public interface IPedidoService {
 
     PedidoDTO aceptarRechazarPedido(String username, EstadoPedidoDTO estadoPedidoDTO);
 
-    PedidoDTO cancelarPedido(String username, EstadoPedidoDTO estadoPedidoDTO);
+    void cancelarPedido(String username, EstadoPedidoDTO estadoPedidoDTO);
 
     List<PedidoDTO> listarPedidosRecibidos(String username);
 

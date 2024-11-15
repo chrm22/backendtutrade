@@ -58,15 +58,29 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoResponse);
     }
 
+//    @PutMapping("/pedidos/realizados")
+//    public ResponseEntity<PedidoDTO> cancelarPedido(@RequestBody EstadoPedidoDTO estadoPedidoDTO) {
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//
+//        PedidoDTO pedidoResponse = pedidoService.cancelarPedido(username, estadoPedidoDTO);
+//
+//        return ResponseEntity.ok(pedidoResponse);
+//    }
+
     @PutMapping("/pedidos/realizados")
-    public ResponseEntity<PedidoDTO> cancelarPedido(@RequestBody EstadoPedidoDTO estadoPedidoDTO) {
+    public ResponseEntity<Void> cancelarPedido(@RequestBody EstadoPedidoDTO estadoPedidoDTO) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        PedidoDTO pedidoResponse = pedidoService.cancelarPedido(username, estadoPedidoDTO);
-
-        return ResponseEntity.ok(pedidoResponse);
+        try {
+            pedidoService.cancelarPedido(username, estadoPedidoDTO);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/pedidos/recibidos")

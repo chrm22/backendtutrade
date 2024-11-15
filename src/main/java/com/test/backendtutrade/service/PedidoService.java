@@ -97,7 +97,7 @@ public class PedidoService implements IPedidoService {
 
     @Override
     @Transactional
-    public PedidoDTO cancelarPedido(String username, EstadoPedidoDTO estadoPedidoDTO) {
+    public void cancelarPedido(String username, EstadoPedidoDTO estadoPedidoDTO) {
 
         Pedido pedido = pedidoRepository.findById(estadoPedidoDTO.pedidoId())
                 .orElseThrow(() -> new RuntimeException("Pedido Ano encontrado"));
@@ -109,12 +109,12 @@ public class PedidoService implements IPedidoService {
             throw new RuntimeException("Pedido ya no disponible");
 
         if (estadoPedidoDTO.opcion().equals("cancelar"))
-            pedido.setEstado("cancelado");
+            pedidoRepository.delete(pedido);
+//            pedido.setEstado("cancelado");
         else throw new RuntimeException("Opción inválida");
 
-        Pedido pedidoResponse = pedidoRepository.save(pedido);
-
-        return pedidoMapper.pedidoToPedidoDTO(pedidoResponse);
+//        Pedido pedidoResponse = pedidoRepository.save(pedido);
+//        return pedidoMapper.pedidoToPedidoDTO(pedidoResponse);
     }
 
     @Override
