@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class UsuarioDTO implements Serializable {
     private Long id;
     private String username;
+    private String urlFotoPerfil;
     private String nombre;
     private String apellido;
     private String dni;

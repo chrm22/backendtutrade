@@ -11,6 +11,7 @@ import java.util.List;
 public class UsuarioPerfilDTO {
     Long id;
     String username;
+    String urlFotoPerfil;
     String nombreCompleto;
     String localidad;
     Integer cantidadIntercambios;

@@ -29,6 +29,9 @@ public class Usuario {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "url_foto_perfil")
+    private String urlFotoPerfil;
+
     @CreationTimestamp
     @Column(name = "fecha_hora_creacion", nullable = false)
     private Instant fechaHoraCreacion;

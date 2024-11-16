@@ -49,6 +49,7 @@ public class UsuarioService implements IUsuarioService {
         usuarioRegistroDTO = new UsuarioRegistroDTO(
                 usuarioRegistroDTO.getUsername(),
                 passwordEncoder.encode(usuarioRegistroDTO.getPassword()),
+                usuarioRegistroDTO.getUrlFotoPerfil(),
                 usuarioRegistroDTO.getNombre(),
                 usuarioRegistroDTO.getApellido(),
                 usuarioRegistroDTO.getDni(),

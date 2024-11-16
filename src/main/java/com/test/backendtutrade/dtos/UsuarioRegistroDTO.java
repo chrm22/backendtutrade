@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class UsuarioRegistroDTO implements Serializable {
     String username;
     String password;
+    String urlFotoPerfil;
     String nombre;
     String apellido;
     String dni;

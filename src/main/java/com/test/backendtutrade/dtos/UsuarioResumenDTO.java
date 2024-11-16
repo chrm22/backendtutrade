@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 public class UsuarioResumenDTO {
     Long id;
     String username;
+    String urlFotoPerfil;
     String nombreCompleto;
     String localidad;
 }
