@@ -65,7 +65,9 @@ public class PedidoService implements IPedidoService {
                 pedido.getArticuloOfrecido().getUsuario().getUsername().equals(username)))
             throw new RuntimeException("Acceso denegado");
 
-        if (!pedido.getEstado().equals("pendiente"))
+        if (!(pedido.getEstado().equals("pendiente") ||
+              pedido.getEstado().equals("aceptado") ||
+              pedido.getEstado().equals("rechazado")))
             throw new RuntimeException("Pedido ya no disponible");
 
         return pedidoMapper.pedidoToPedidoDTO(pedido);
