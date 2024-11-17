@@ -58,17 +58,6 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoResponse);
     }
 
-//    @PutMapping("/pedidos/realizados")
-//    public ResponseEntity<PedidoDTO> cancelarPedido(@RequestBody EstadoPedidoDTO estadoPedidoDTO) {
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String username = authentication.getName();
-//
-//        PedidoDTO pedidoResponse = pedidoService.cancelarPedido(username, estadoPedidoDTO);
-//
-//        return ResponseEntity.ok(pedidoResponse);
-//    }
-
     @PutMapping("/pedidos/realizados")
     public ResponseEntity<Void> cancelarPedido(@RequestBody EstadoPedidoDTO estadoPedidoDTO) {
 

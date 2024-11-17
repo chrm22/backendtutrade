@@ -51,8 +51,30 @@ public class ArticuloService implements IArticuloService {
             return articuloResponse;
         }
         else {
-            throw new ResourceNotFoundException("Articulo no encontrado");
+            throw new RuntimeException("Permiso denegado");
         }
+    }
+
+    @Override
+    @Transactional
+    public void eliminarArticuloUsuario(String username, Long id) {
+        Articulo articulo = articuloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Articulo no encontrado"));
+
+        if (!articulo.getUsuario().getUsername().equals(username)) {
+            throw new RuntimeException("Permiso denegado.");
+        }
+
+        articulo.setEstado("eliminado");
+
+        List<Pedido> pedidosEnviados = pedidoRepository.findAllByArticuloOfrecidoId(articulo.getId());
+        List<Pedido> pedidosRecibidos = pedidoRepository.findAllByArticuloId(articulo.getId());
+
+        pedidoRepository.deleteAll(pedidosEnviados);
+        pedidoRepository.deleteAll(pedidosRecibidos);
+
+        articuloRepository.save(articulo);
+
     }
 
     @Override

@@ -2,11 +2,13 @@ package com.test.backendtutrade.service;
 
 import com.test.backendtutrade.dtos.*;
 import com.test.backendtutrade.entities.InfoUsuario;
+import com.test.backendtutrade.entities.Pedido;
 import com.test.backendtutrade.entities.Rol;
 import com.test.backendtutrade.entities.Usuario;
 import com.test.backendtutrade.exceptions.ResourceNotFoundException;
 import com.test.backendtutrade.interfaces.IUsuarioService;
 import com.test.backendtutrade.mappers.UsuarioMapper;
+import com.test.backendtutrade.repository.PedidoRepository;
 import com.test.backendtutrade.repository.RolRepository;
 import com.test.backendtutrade.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +24,18 @@ import java.util.stream.Collectors;
 public class UsuarioService implements IUsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PedidoRepository pedidoRepository;
     private final RolRepository rolRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, RolRepository rolRepository, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, RolRepository rolRepository, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder, PedidoRepository pedidoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
+        this.pedidoRepository = pedidoRepository;
     }
 
     @Override
@@ -121,7 +125,17 @@ public class UsuarioService implements IUsuarioService {
 
         usuario.getRoles().clear();
 
-        usuario.getArticulos().forEach(articulo -> articulo.setEstado("eliminado"));
+        usuario.getArticulos().forEach(
+                articulo -> {
+                    articulo.setEstado("eliminado");
+
+                    List< Pedido > pedidosEnviados = pedidoRepository.findAllByArticuloOfrecidoId(articulo.getId());
+                    List<Pedido> pedidosRecibidos = pedidoRepository.findAllByArticuloId(articulo.getId());
+
+                    pedidoRepository.deleteAll(pedidosEnviados);
+                    pedidoRepository.deleteAll(pedidosRecibidos);
+                }
+        );
 
         usuarioRepository.save(usuario);
 

@@ -34,6 +34,19 @@ public class ArticuloController {
         return ResponseEntity.ok(articulo);
     }
 
+    @DeleteMapping("/articulos/eliminar/usuario/{id}")
+    public ResponseEntity<Void> eliminarArticuloUsuario(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        try {
+            articuloService.eliminarArticuloUsuario(username, id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/articulos")
     public ResponseEntity<List<ArticuloDTO>> listarArticulosPublicos() {
 

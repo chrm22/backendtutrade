@@ -39,6 +39,7 @@ public interface ArticuloRepository extends JpaRepository<Articulo, Long> {
     @Query("select a from Articulo a " +
             "left join a.articulosPedidos p " +
             "where a.usuario.username = ?1 " +
+            "and a.estado not like 'eliminado' " +
             "and (p.id is null or p.articulo.id != ?2)")
     List<Articulo> listarMisArticulosExceptoOfrecidosA(String username, Long id);
 

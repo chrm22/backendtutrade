@@ -12,6 +12,8 @@ public interface IArticuloService {
 
     List<ArticuloDTO> listarArticulosPublicos();
 
+    void eliminarArticuloUsuario(String username, Long id);
+
     List<ArticuloDTO> listarArticulosPublicosExcluirUsuario(String username);
 
     List<ArticuloDTO> listarArticulosPublicosPorUsuario(String username);
