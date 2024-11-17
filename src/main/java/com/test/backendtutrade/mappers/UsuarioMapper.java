@@ -38,6 +38,7 @@ public interface UsuarioMapper {
 
     @Mapping(target = "username", source = "username")
     @Mapping(target = "password", source = "password")
+    @Mapping(target = "urlFotoPerfil", source = "urlFotoPerfil")
     @Mapping(target = "informacionUsuario.nombre", source = "nombre")
     @Mapping(target = "informacionUsuario.apellido", source = "apellido")
     @Mapping(target = "informacionUsuario.dni", source = "dni")
